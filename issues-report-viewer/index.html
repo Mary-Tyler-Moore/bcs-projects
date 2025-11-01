@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="utf-8" />
+  <title>Issues Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Tailwind config (load before CDN) -->
+  <script src="./tailwind-config.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- CSV parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <!-- html2pdf -->
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+
+  <style>
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .note-input { width: 36rem; max-width: 100vw; margin-left: 50px; }
+
+    /* Keep rows / logical chunks together in PDF */
+    .pdf-keep { break-inside: avoid; page-break-inside: avoid; }
+    .pdf-avoid-break-after { break-after: avoid; page-break-after: avoid; }
+
+    /* Forced page breaks if a block overflows the page */
+    .pdf-force-break-before { break-before: page; page-break-before: always; }
+
+    /* Ensure the html2pdf cloned container has zero top offset */
+    .html2pdf__container, .html2pdf__container * {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+
+    @media print {
+      html, body { margin:0 !important; padding:0 !important; }
+      .pdf-keep { break-inside: avoid-page; }
+      .pdf-force-break-before { break-before: page; }
+    }
+  </style>
+</head>
+
+<body class="h-full bg-gray-50 text-gray-900 dark:bg-ink dark:text-slate-200">
+  <header class="border-b border-gray-200 bg-white/70 backdrop-blur dark:bg-panel/70 dark:border-gray-800">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex items-start sm:items-center justify-between gap-4">
+      <div>
+        <h1 id="page-title" class="text-2xl font-bold">Issues Report — </h1>
+        <p class="text-gray-600 dark:text-slate-400">Upload or drop a .csv/.txt file</p>
+      </div>
+
+      <!-- Theme toggle -->
+      <button id="themeToggle"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-300/60 dark:border-slate-600/60 hover:shadow"
+              title="Toggle dark mode" aria-label="Toggle dark mode">
+        <span id="themeIcon" class="text-lg" aria-hidden="true">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <!-- Upload -->
+    <section class="bg-white rounded-2xl shadow border border-gray-200 p-5 space-y-4 dark:bg-panel dark:border-gray-800">
+      <div class="flex items-center gap-3">
+        <label for="file-input" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300/60 hover:shadow cursor-pointer dark:border-slate-600/60">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M8 12l4 4m0 0l4-4m-4 4V4"/>
+          </svg>
+          <span>Upload .csv / .txt</span>
+        </label>
+        <input id="file-input" type="file" accept=".csv,.txt,text/plain" class="hidden">
+      </div>
+
+      <div id="drop-zone" class="rounded-xl border-2 border-dashed border-slate-300/60 p-6 text-center text-slate-600 dark:text-slate-400 dark:border-slate-600/60">
+        Drag & drop a .csv/.txt file here
+      </div>
+    </section>
+
+    <!-- Issues by Type -->
+    <section id="table-section" class="hidden bg-white rounded-2xl shadow border border-gray-200 p-5 dark:bg-panel dark:border-gray-800">
+      <h2 class="text-xl font-semibold mb-4">Issues by Type</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-200 rounded-xl overflow-hidden dark:border-gray-800">
+          <thead class="bg-gray-50 dark:bg-edge">
+            <tr>
+              <th class="text-left px-4 py-2 border-b border-gray-200 dark:border-gray-800">Issue</th>
+              <th class="text-right px-4 py-2 border-b border-gray-200 dark:border-gray-800">Count</th>
+            </tr>
+          </thead>
+          <tbody id="issues-tbody" class="divide-y divide-gray-200 dark:divide-gray-800"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Formatted output (plain text) -->
+    <section class="bg-white rounded-2xl shadow border border-gray-200 p-5 space-y-4 dark:bg-panel dark:border-gray-800">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold">Formatted Output</h2>
+        <div class="flex items-center gap-3">
+          <button id="copy-btn" class="px-4 py-2 rounded-xl border border-slate-300/60 hover:shadow dark:border-slate-600/60">Copy</button>
+          <button id="download-btn" class="px-4 py-2 rounded-xl border border-slate-300/60 hover:shadow dark:border-slate-600/60">Download .txt</button>
+          <button id="download-pdf-btn" class="px-4 py-2 rounded-xl border border-slate-300/60 hover:shadow dark:border-slate-600/60">Download PDF</button>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div id="toolbar" class="border rounded-2xl p-3 bg-gray-50 dark:bg-edge dark:border-gray-800"></div>
+
+      <!-- What the PDF will capture -->
+      <div id="preview-plain" class="space-y-2"></div>
+    </section>
+  </main>
+
+  <script type="module">
+  import { createRackBox, repaintRackBoxes } from './site-map.js';
+  import { mountLiveReportClock, getReportTimestamp } from './issues-time.js';
+  import { mountToolbar } from './toolbar.js';
+
+  // Apply theme
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+
+  function applyTheme(mode) {
+    if (mode === 'dark') {
+      root.classList.add('dark');
+      themeIcon.textContent = '☀️';
+    } else {
+      root.classList.remove('dark');
+      themeIcon.textContent = '🌙';
+    }
+    try { localStorage.setItem('theme', mode); } catch {}
+    // Repaint live rack boxes when toggling
+    repaintRackBoxes(document, { forceLight: false });
+  }
+
+  applyTheme(
+    localStorage.getItem('theme')
+    || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light')
+  );
+
+  themeToggle.addEventListener('click', () => {
+    const next = root.classList.contains('dark') ? 'light' : 'dark';
+    applyTheme(next);
+  });
+
+  // Header timestamp
+  const pageTitleEl = document.getElementById('page-title');
+  pageTitleEl.textContent = `Deployment Tool — ${getReportTimestamp()}`;
+
+  // State
+  const state = {
+    csvRows: [],
+    occupied: new Set(), 
+    openMap: {},
+    positionBase: 1
+  };
+
+  // CSV helpers
+  function normalizeRowKeys(row) {
+    const out = {};
+    for (const [k,v] of Object.entries(row)) {
+      const nk = String(k)
+        .replace(/^\uFEFF/,'')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g,'_');
+      out[nk] = v;
+    }
+    return out;
+  }
+
+  function getGroup(r) {
+    for (const key of Object.keys(r)) {
+      if (key.includes('rack_group') || key.includes('group_name')) {
+        if (r[key]) return String(r[key]).trim();
+      }
+    }
+    if (r.miner_rack) {
+      const m = String(r.miner_rack).match(/^[A-Za-z]+\d+/);
+      if (m) return m[0];
+    }
+    return '';
+  }
+
+  function getRackNumber(r) {
+    if (r.miner_rack) {
+      const m = String(r.miner_rack).match(/\.?R\s*(\d+)/i);
+      if (m) return parseInt(m[1],10);
+    }
+    for (const key of Object.keys(r)) {
+      if (key.includes('rack_name')) {
+        const m = String(r[key]||'').match(/R\s*(\d+)/i);
+        if (m) return parseInt(m[1],10);
+      }
+    }
+    return null;
+  }
+
+  function getRowIdx(r) {
+    let shelf = null;
+    let pos = null;
+    for (const k of Object.keys(r)) {
+      if (k.endsWith('row')) {
+        const val = Number(r[k]);
+        if (!Number.isNaN(val)) shelf = val;
+      }
+      if (k.endsWith('index') || k.endsWith('idx')) {
+        const val = Number(r[k]);
+        if (!Number.isNaN(val)) pos = val;
+      }
+    }
+    return { shelf, pos };
+  }
+
+  function slotKey(group, rackNum, shelf, pos) {
+    return `${group}|${rackNum}|${shelf}|${pos}`;
+  }
+
+  // Build rack grid
+  function getRackDimensions(group, rackNumber) {
+    // Temporary rackBox with row=0,idx=0 just so it renders
+    const temp = createRackBox({ group, rackNumber, row: 0, idx: 0, style:{cell:10} });
+
+    // The first child is the grid div
+    const grid = temp.querySelector('div');
+    if (!grid) {
+      return { cols: 0, rows: 0 };
+    }
+
+    // Count cells
+    const cells = Array.from(grid.querySelectorAll('div'));
+    // getComputedStyle to read template columns length
+    const styles = getComputedStyle(grid);
+    const templateCols = styles.gridTemplateColumns.split(' ').length;
+    // rows = total cells / cols
+    const cols = templateCols;
+    const rows = cols ? (cells.length / cols) : 0;
+
+    return { cols, rows };
+  }
+
+  // Recompute occupied/open
+  function recomputeOpenMap() {
+    state.occupied.clear();
+
+    for (const row of state.csvRows) {
+      const group = getGroup(row);
+      const rackNum = getRackNumber(row);
+      const { shelf, pos } = getRowIdx(row);
+      if (!group || rackNum == null || shelf == null || pos == null) continue;
+      state.occupied.add(slotKey(group, rackNum, shelf, pos));
+    }
+
+    const out = {};
+
+    // Build list of all (group,rack) found in the CSV
+    const seenPairs = new Set();
+    for (const row of state.csvRows) {
+      const g = getGroup(row);
+      const rN = getRackNumber(row);
+      if (!g || rN == null) continue;
+      seenPairs.add(`${g}|${rN}`);
+    }
+
+    // Compute capacity for each rack from site-map.js dimensions
+    for (const pair of seenPairs) {
+      const [group, rackNumStr] = pair.split('|');
+      const rackNum = Number(rackNumStr);
+
+      const { cols, rows } = getRackDimensions(group, rackNum);
+
+      // skip racks we can't dimension
+      if (!cols || !rows) continue;
+
+      if (!out[group]) out[group] = {};
+
+      const totalSlots = cols * rows;
+      let occCount = 0;
+      const openList = [];
+
+      for (let shelf = 0; shelf < rows; shelf++) {
+        for (let pos = 0; pos < cols; pos++) {
+          const k = slotKey(group, rackNum, shelf, pos);
+          if (state.occupied.has(k)) {
+            occCount++;
+          } else {
+            openList.push({ shelf, pos });
+          }
+        }
+      }
+
+      out[group][rackNum] = {
+        total: totalSlots,
+        occupied: occCount,
+        open: totalSlots - occCount,
+        openList
+      };
+    }
+
+    state.openMap = out;
+  }
+
+  // Render summary + preview
+  function renderSummaryTable() {
+    const tbody = document.getElementById('summary-tbody');
+    tbody.innerHTML = '';
+
+    const groups = Object.keys(state.openMap).sort();
+    for (const group of groups) {
+      const racks = state.openMap[group];
+      const rackNums = Object.keys(racks).map(n=>parseInt(n,10)).sort((a,b)=>a-b);
+
+      for (const rackNum of rackNums) {
+        const info = racks[rackNum];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-800">${group}</td>
+          <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-800">${rackNum}</td>
+          <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-800 text-right">${info.total}</td>
+          <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-800 text-right">${info.occupied}</td>
+          <td class="px-4 py-2 border-b border-gray-200 dark:border-gray-800 text-right font-semibold">${info.open}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    document.getElementById('summary-section').classList.remove('hidden');
+  }
+
+  function formatCoord(rackNum, shelf, pos, base) {
+    return `R${rackNum}.S${shelf+base}.P${pos+base}`;
+  }
+
+  function buildRackBlock(group, rackNum, rackInfo) {
+    const block = document.createElement('div');
+    block.className = 'pdf-keep border border-gray-200 dark:border-gray-800 rounded-xl p-4 bg-white dark:bg-panel shadow';
+
+    const header = document.createElement('div');
+    header.className = 'flex items-start justify-between flex-wrap gap-2 mb-3';
+
+    const title = document.createElement('div');
+    title.className = 'mono text-sm font-semibold';
+    title.textContent = `${group} — Rack ${rackNum}`;
+    header.appendChild(title);
+
+    const counts = document.createElement('div');
+    counts.className = 'text-xs text-gray-600 dark:text-slate-400 mono';
+    counts.textContent = `Open ${rackInfo.open}/${rackInfo.total}`;
+    header.appendChild(counts);
+
+    block.appendChild(header);
+
+    if (rackInfo.openList.length === 0) {
+      const none = document.createElement('div');
+      none.className = 'mono text-xs text-gray-500 dark:text-slate-400';
+      none.textContent = 'No open slots';
+      block.appendChild(none);
+      return block;
+    }
+
+    const listWrap = document.createElement('div');
+    listWrap.className = 'space-y-3';
+
+    for (const slot of rackInfo.openList) {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'flex items-center gap-4 pdf-keep';
+
+      const left = document.createElement('div');
+      left.className = 'mono text-xs leading-5';
+      left.textContent = formatCoord(rackNum, slot.shelf, slot.pos, state.positionBase);
+
+      // mini map for THIS slot
+      const mapHolder = document.createElement('div');
+      mapHolder.className = 'min-w-[120px]';
+
+      const mapEl = createRackBox({
+        group,
+        rackNumber: rackNum,
+        row: slot.shelf,
+        idx: slot.pos,
+        style: { cell: 10 }
+      });
+
+      mapHolder.appendChild(mapEl);
+
+      rowEl.appendChild(left);
+      rowEl.appendChild(mapHolder);
+      listWrap.appendChild(rowEl);
+    }
+
+    block.appendChild(listWrap);
+    return block;
+  }
+
+  function renderPreview() {
+    const container = document.getElementById('preview-plain');
+    container.innerHTML = '';
+
+    const header = document.createElement('div');
+    header.className = 'mono text-sm text-gray-700 dark:text-slate-300 pdf-keep';
+    header.textContent = `Open Rack Locations — ${getReportTimestamp()}`;
+    container.appendChild(header);
+
+    const groups = Object.keys(state.openMap).sort();
+    for (const group of groups) {
+      const racks = state.openMap[group];
+      const rackNums = Object.keys(racks).map(n=>parseInt(n,10)).sort((a,b)=>a-b);
+
+      for (const rackNum of rackNums) {
+        const rackInfo = racks[rackNum];
+        const block = buildRackBlock(group, rackNum, rackInfo);
+        container.appendChild(block);
+      }
+    }
+
+    // repaint the live page maps for correct dark/light colors
+    repaintRackBoxes(document, { forceLight: false });
+  }
+
+  // Plain text + copy + download
+  function buildPlainText() {
+    const lines = [];
+    lines.push(`Open Rack Locations — ${getReportTimestamp()}`);
+    lines.push('');
+
+    const groups = Object.keys(state.openMap).sort();
+    for (const group of groups) {
+      const racks = state.openMap[group];
+      const rackNums = Object.keys(racks).map(n=>parseInt(n,10)).sort((a,b)=>a-b);
+      for (const rackNum of rackNums) {
+        const info = racks[rackNum];
+        lines.push(`${group} Rack ${rackNum} — Open ${info.open}/${info.total}`);
+        if (info.openList.length === 0) {
+          lines.push('\t(no open slots)');
+        } else {
+          for (const slot of info.openList) {
+            lines.push('\t' + formatCoord(rackNum, slot.shelf, slot.pos, state.positionBase));
+          }
+        }
+        lines.push('');
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  function doCopy() {
+    const text = buildPlainText();
+    return navigator.clipboard.writeText(text);
+  }
+
+  function triggerDownload(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function doDownloadTXT() {
+    const text = buildPlainText();
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    triggerDownload(blob, `open_rack_locations.txt`);
+  }
+
+  // PDF export (forces light mode)
+  function doDownloadPDF() {
+    const element = document.getElementById('preview-plain');
+    if (!element) return;
+
+    const opt = {
+      margin:      [8, 10, 26, 10],
+      filename:    'open_rack_locations.pdf',
+      image:       { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true, scrollY: 0, windowWidth: element.scrollWidth },
+      jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+      pagebreak:   { mode: ['css','legacy'], avoid:['.pdf-keep'], before:['.pdf-force-break-before'] }
+    };
+
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .toContainer()
+      .get('container', (container) => {
+        // Force light mode in PDF 
+        container.setAttribute('data-force-light','1');
+
+        const style = document.createElement('style');
+        style.textContent = `
+          [data-force-light], [data-force-light] * {
+            color: #000 !important;
+            -webkit-text-fill-color: #000 !important;
+          }
+        `;
+        container.ownerDocument.head.appendChild(style);
+
+        // Repaint just inside the cloned container for PDF
+        repaintRackBoxes(container, { forceLight: true });
+      })
+      .toCanvas()
+      .toPdf()
+      .get('pdf')
+      .then((pdf) => {
+        const totalPages = pdf.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          const pageSize = pdf.internal.pageSize;
+          const w = pageSize.getWidth();
+          const h = pageSize.getHeight();
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(9);
+          pdf.setTextColor(0,0,0);
+          pdf.text(String(i), w - 10, h - 23, { align: 'right', baseline: 'alphabetic' });
+        }
+      })
+      .save();
+  }
+
+  // Toolbar
+  mountToolbar({
+    container: document.getElementById('toolbar'),
+    initial: {
+      positionBase: state.positionBase
+    },
+    onChange: ({ positionBase }) => {
+      if (positionBase !== undefined) {
+        state.positionBase = positionBase;
+        renderPreview();
+      }
+    }
+  });
+
+  // CSV drag/drop + parsing
+  const fileInput = document.getElementById('file-input');
+  const dropZone  = document.getElementById('drop-zone');
+
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    await parseCSVText(text);
+    e.target.value = '';
+  });
+
+  dropZone.addEventListener('drop', async (e) => {
+    e.preventDefault(); e.stopPropagation();
+    dropZone.classList.remove('bg-gray-50', 'dark:bg-edge');
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    await parseCSVText(text);
+  });
+
+  ['dragenter','dragover'].forEach(evt =>
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dropZone.classList.add('bg-gray-50','dark:bg-edge');
+    })
+  );
+  ['dragleave','drop'].forEach(evt =>
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dropZone.classList.remove('bg-gray-50','dark:bg-edge');
+    })
+  );
+
+  // Buttons
+  document.getElementById('copy-btn').addEventListener('click', async () => {
+    if (!state.csvRows.length) return alert('Upload a CSV first.');
+    try {
+      await doCopy();
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(()=> btn.textContent = 'Copy', 1200);
+    } catch (err) {
+      alert('Copy failed: ' + err.message);
+    }
+  });
+
+  document.getElementById('download-btn').addEventListener('click', () => {
+    if (!state.csvRows.length) return alert('Upload a CSV first.');
+    doDownloadTXT();
+  });
+
+  document.getElementById('download-pdf-btn').addEventListener('click', () => {
+    if (!state.csvRows.length) return alert('Upload a CSV first.');
+    doDownloadPDF();
+  });
+
+  // CSV parse -> recompute -> render
+  async function parseCSVText(csvText) {
+    const raw = csvText.replace(/^\uFEFF/, '');
+    const result = Papa.parse(raw, {
+      header: true,
+      skipEmptyLines: true,
+      dynamicTyping: false
+    });
+
+    state.csvRows = (result.data || []).map(normalizeRowKeys);
+
+    recomputeOpenMap();
+    renderSummaryTable();
+    renderPreview();
+  }
+</script>
+
+</body>
+</html>

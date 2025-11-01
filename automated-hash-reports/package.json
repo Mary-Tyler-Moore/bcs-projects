@@ -1,0 +1,28 @@
+{
+  "name": "automated-hash-reports",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "npx serve -l 3001 public",
+    "serve": "npx serve -l 3001 public",
+    "refresh": "node scripts/refresh.js",
+    "discover": "node scripts/discoveryquery.js --all --hours=24",
+    "backfill": "node scripts/backfill-reports-index.js --reports-dir public/reports",
+    "backfill-json": "node scripts/backfill-reports-json.js --reports-dir public/reports",
+    "format-json": "node scripts/format-reports-json.js --reports-dir public/reports"
+  },
+  "dependencies": {
+    "@google-cloud/bigquery": "^7.9.0",
+    "@octokit/rest": "^22.0.0",
+    "@vercel/blob": "^0.23.2",
+    "cheerio": "^1.1.2",
+    "dotenv": "^16.6.1",
+    "fetch-cookie": "^3.1.0",
+    "node-fetch": "^3.3.2",
+    "serve": "^14.2.3",
+    "tough-cookie": "^6.0.0"
+  }
+}

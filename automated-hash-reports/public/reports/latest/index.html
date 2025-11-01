@@ -1,0 +1,16 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Latest Hash Report</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<script>
+(async function(){
+  try{
+    const r = await fetch('/reports/index.json', {cache:'no-cache'});
+    const m = await r.json();
+    const first = m?.reports?.[0]?.path;
+    if(first){ location.replace(first); }
+    else { document.body.innerHTML = '<p>No reports yet.</p>'; }
+  }catch(e){
+    document.body.innerHTML = '<p>Unable to load latest report.</p>';
+  }
+})();
+</script>
+</head><body></body></html>

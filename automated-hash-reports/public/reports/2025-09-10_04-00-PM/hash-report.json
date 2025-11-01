@@ -1,0 +1,592 @@
+{
+  "generatedAt": "2025-09-10T20:00:19.815Z",
+  "windowHours": 24,
+  "currentSnapshotTs": "2025-09-10T18:00:00.000Z",
+  "overall": {
+    "current_phs": 0,
+    "avg24_phs": 0
+  },
+  "sylvania": {
+    "current": {
+      "total": 0,
+      "antpool": 0,
+      "blockware": 0,
+      "other": 0
+    },
+    "avg24": {
+      "total": 0,
+      "antpool": 0,
+      "blockware": 0,
+      "other": 0
+    }
+  },
+  "bitmain": {
+    "current": {
+      "total": 0,
+      "kjdga": 0,
+      "f2pool": 0,
+      "other": 0
+    },
+    "avg24": {
+      "total": 0,
+      "kjdga": 0,
+      "f2pool": 0,
+      "other": 0
+    }
+  },
+  "tables": {
+    "sylvania": {
+      "rows": [
+        {
+          "group": "AB01",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB01",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB02",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB03",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB04",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB05",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB14",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB15",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB16",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        }
+      ],
+      "totals": {
+        "deployed": 0,
+        "reachable": 0,
+        "hashing": 0,
+        "not_hashing": 0,
+        "efficiency_pct": 0,
+        "not_hashing_rate_pct": 0
+      },
+      "blockware_efficiency_pct": 0
+    },
+    "bitmain": {
+      "rows": [
+        {
+          "group": "MB06",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB07",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB08",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB09",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB10",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB11",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB12",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB13",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB17",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB18",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB19",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB20",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB21",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB22",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        },
+        {
+          "group": "MB23",
+          "deployed": 0,
+          "reachable": 0,
+          "hashing": 0,
+          "not_hashing": 0,
+          "efficiency_pct": 0,
+          "not_hashing_rate_pct": 0
+        }
+      ],
+      "totals": {
+        "deployed": 0,
+        "reachable": 0,
+        "hashing": 0,
+        "not_hashing": 0,
+        "efficiency_pct": 0,
+        "not_hashing_rate_pct": 0
+      }
+    }
+  },
+  "foreman": {
+    "issuesByGroup": {
+      "bcs": {
+        "MB02": [
+          {
+            "position": "R02.S3.P0",
+            "ip": "0",
+            "mac": "0"
+          }
+        ],
+        "MB04": [
+          {
+            "position": "R04.S4.P3",
+            "ip": "0",
+            "mac": "0"
+          }
+        ],
+        "MB15": [
+          {
+            "position": "R15.S2.P2",
+            "ip": "0",
+            "mac": "0"
+          }
+        ],
+        "MB16": [
+          {
+            "position": "R16.S2.P0",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R16.S2.P1",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R16.S3.P3",
+            "ip": "0",
+            "mac": "0"
+          }
+        ]
+      },
+      "bm": {
+        "MB11": [
+          {
+            "position": "R11.S5.P2",
+            "ip": "0",
+            "mac": "0"
+          }
+        ],
+        "MB17": [
+          {
+            "position": "R17.S0.P9",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R17.S2.P6",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R17.S6.P2",
+            "ip": "0",
+            "mac": "0"
+          }
+        ],
+        "MB18": [
+          {
+            "position": "R18.S5.P7",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R18.S6.P2",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R18.S6.P3",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R18.S6.P7",
+            "ip": "0",
+            "mac": "0"
+          }
+        ],
+        "MB19": [
+          {
+            "position": "R19.S2.P3",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R19.S6.P2",
+            "ip": "0",
+            "mac": "0"
+          }
+        ],
+        "MB20": [
+          {
+            "position": "R20.S1.P3",
+            "ip": "0",
+            "mac": "0"
+          }
+        ],
+        "MB21": [
+          {
+            "position": "R21.S0.P4",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R21.S0.P5",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R21.S2.P4",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R21.S4.P4",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R21.S5.P4",
+            "ip": "0",
+            "mac": "0"
+          },
+          {
+            "position": "R21.S6.P1",
+            "ip": "0",
+            "mac": "0"
+          }
+        ]
+      }
+    }
+  },
+  "weather": {
+    "sylvania": {
+      "generatedAt": "2025-09-10T20:00:10.447Z",
+      "current": {
+        "temperature_f": 54.5,
+        "humidity_pct": 92,
+        "label": "Clear sky"
+      },
+      "today": {
+        "high_f": 60.4,
+        "high_time_window_local": "5 PM - 6 PM",
+        "label": "Clear sky"
+      },
+      "hourly": {
+        "points": [
+          {
+            "time_utc": "2025-09-10T04:00",
+            "label_local": "4 AM",
+            "temp_f": 53.6,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T05:00",
+            "label_local": "5 AM",
+            "temp_f": 53.3,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T06:00",
+            "label_local": "6 AM",
+            "temp_f": 52.6,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T07:00",
+            "label_local": "7 AM",
+            "temp_f": 52.2,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T08:00",
+            "label_local": "8 AM",
+            "temp_f": 52.3,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T09:00",
+            "label_local": "9 AM",
+            "temp_f": 52.4,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T10:00",
+            "label_local": "10 AM",
+            "temp_f": 52.3,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T11:00",
+            "label_local": "11 AM",
+            "temp_f": 51.2,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T12:00",
+            "label_local": "12 PM",
+            "temp_f": 51.9,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T13:00",
+            "label_local": "1 PM",
+            "temp_f": 52,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T14:00",
+            "label_local": "2 PM",
+            "temp_f": 52.4,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T15:00",
+            "label_local": "3 PM",
+            "temp_f": 52.8,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T16:00",
+            "label_local": "4 PM",
+            "temp_f": 54.1,
+            "forecast": false
+          },
+          {
+            "time_utc": "2025-09-10T17:00",
+            "label_local": "5 PM",
+            "temp_f": 55.2,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-10T18:00",
+            "label_local": "6 PM",
+            "temp_f": 57.6,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-10T19:00",
+            "label_local": "7 PM",
+            "temp_f": 58.8,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-10T20:00",
+            "label_local": "8 PM",
+            "temp_f": 59.7,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-10T21:00",
+            "label_local": "9 PM",
+            "temp_f": 60.4,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-10T22:00",
+            "label_local": "10 PM",
+            "temp_f": 59.8,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-10T23:00",
+            "label_local": "11 PM",
+            "temp_f": 59.8,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-11T00:00",
+            "label_local": "12 AM",
+            "temp_f": 58.7,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-11T01:00",
+            "label_local": "1 AM",
+            "temp_f": 59.4,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-11T02:00",
+            "label_local": "2 AM",
+            "temp_f": 59.7,
+            "forecast": true
+          },
+          {
+            "time_utc": "2025-09-11T03:00",
+            "label_local": "3 AM",
+            "temp_f": 54.4,
+            "forecast": true
+          }
+        ]
+      }
+    }
+  },
+  "powerCost": {
+    "min_cents_kwh": 0,
+    "max_cents_kwh": 0,
+    "fetchedAt": "2025-09-10T20:00:11.387Z",
+    "source": "meagpower"
+  }
+}

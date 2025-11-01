@@ -1,0 +1,278 @@
+<!doctype html>
+<html class="h-full bg-gray-50">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hash Report — Monday, September 1, 2025 at 4:00 PM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+    <style>.chart-box{position:relative;width:75vw;max-width:1000px;height:240px;margin:0 auto;}</style>
+  </head>
+  <body class="h-full text-gray-900">
+    <header class="border-b border-gray-200 bg-white/70 backdrop-blur">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <a href="/" class="text-lg font-semibold">Hash Report</a>
+          <span id="active-report-label" class="text-sm text-gray-500"></span>
+        </div>
+        <nav class="flex items-center gap-3">
+          <a class="text-sm text-blue-700 hover:underline" href="/dashboard.html">Dashboard</a>
+          <a class="text-sm text-blue-700 hover:underline" href="/reports/latest/">Latest Report</a>
+          <select id="report-picker" class="text-sm border border-gray-300 rounded-md px-2 py-1">
+            <option value="">Loading reports…</option>
+          </select>
+        </nav>
+      </div>
+    </header>
+
+    <main id="page-root" class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+
+      <!-- Main header totals -->
+      <section class="rounded-2xl bg-white shadow border border-gray-100 p-5">
+        <div class="flex items-baseline justify-between mb-4 gap-4">
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">
+            Hash Report
+            <span id="now-stamp"
+              class="ml-3 pl-3 border-l border-gray-200 text-base sm:text-lg font-normal text-gray-500 align-middle">
+            </span>
+          </h1>
+
+          <div class="text-sm sm:text-base text-gray-700 whitespace-nowrap sm:self-baseline text-right">
+            On Call — <span class="font-semibold">Employee Name</span>
+            <a href="tel:+19125316639" class="text-blue-600 hover:underline">(555) 555-5555</a>
+          </div>
+        </div>
+
+        <div class="pt-2 pb-4 flex justify-end">
+          <button id="btn-export-pdf"
+            class="inline-flex items-center rounded-lg bg-gray-900 text-white px-3 py-2 text-sm shadow hover:bg-gray-800 active:bg-gray-700">
+            Download PDF
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-xl border border-gray-100 p-4">
+            <div class="text-sm text-gray-500">Total Hash Rate</div>
+            <div class="text-3xl font-semibold"><span id="total-current">—</span> PH/s</div>
+            <div class="mt-1 text-xs text-gray-500">Current (latest window)</div>
+          </div>
+          <div class="rounded-xl border border-gray-100 p-4">
+            <div class="text-sm text-gray-500">Total 24HR Hash Rate</div>
+            <div class="text-3xl font-semibold"><span id="total-avg24">—</span> PH/s</div>
+            <div class="mt-1 text-xs text-gray-500">Per-miner average over 24h</div>
+          </div>
+          <div class="rounded-xl border border-gray-100 p-4">
+            <div class="text-sm text-gray-500">Bitmain Hash Rate</div>
+            <div class="text-3xl font-semibold"><span id="bitmain-current">—</span> PH/s</div>
+          </div>
+          <div class="rounded-xl border border-gray-100 p-4">
+            <div class="text-sm text-gray-500">Bitmain 24HR Hash Rate</div>
+            <div class="text-3xl font-semibold"><span id="bitmain-avg24">—</span> PH/s</div>
+          </div>
+        </div>
+
+        <div class="mt-4 inline-flex items-center gap-2 rounded-full bg-gray-900 text-white px-4 py-2 text-sm shadow">
+          <span class="inline-block h-2 w-2 rounded-full bg-emerald-400"></span>
+          <span id="last-updated">Last updated: <em>(data pending)</em></span>
+        </div>
+      </section>
+
+      <!-- POWER COST ALERT -->
+      <section class="rounded-2xl bg-white shadow border border-gray-100 p-5">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">Power Cost Alert</h2>
+          <div class="text-xs text-gray-500" id="power-stamp"></div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-4">
+          <div class="rounded-xl border border-gray-100 p-4">
+            <div class="text-sm text-gray-500">Low (¢/kWh)</div>
+            <div class="text-3xl font-semibold"><span id="power-min">—</span></div>
+          </div>
+          <div class="rounded-xl border border-gray-100 p-4">
+            <div class="text-sm text-gray-500">High (¢/kWh)</div>
+            <div class="text-3xl font-semibold"><span id="power-max">—</span></div>
+          </div>
+        </div>
+
+        <div class="mt-3 text-xs text-gray-500">
+          Values are from the utility’s 24-hour forecast (min and max).
+        </div>
+      </section>
+
+      <!-- Weather -->
+      <section class="rounded-2xl bg-white shadow border border-gray-100 p-5">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">Weather — Sylvania, GA</h2>
+          <div class="text-xs text-gray-500" id="weather-stamp"></div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+          <div class="rounded-lg border border-gray-100 p-3">
+            <div class="text-gray-500">Current Temp</div>
+            <div class="mt-1 text-2xl font-semibold"><span id="weather-current-temp">—</span>°F</div>
+          </div>
+          <div class="rounded-lg border border-gray-100 p-3">
+            <div class="text-gray-500">Humidity</div>
+            <div class="mt-1 text-2xl font-semibold"><span id="weather-humidity">—</span>%</div>
+          </div>
+          <div class="rounded-lg border border-gray-100 p-3">
+            <div class="text-gray-500">High Temp</div>
+            <div class="mt-1 text-2xl font-semibold"><span id="weather-high-temp">—</span>°F</div>
+          </div>
+          <div class="rounded-lg border border-gray-100 p-3">
+            <div class="text-gray-500">High Temp Times</div>
+            <div class="mt-1 text-2xl font-semibold"><span id="weather-high-window">—</span></div>
+          </div>
+        </div>
+
+        <div class="mt-3 text-sm text-gray-700">
+          Conditions: <span id="weather-conditions-line">—</span>
+        </div>
+
+        <div class="mt-5 chart-box">
+          <canvas id="weatherChart"></canvas>
+        </div>
+
+        <div class="mt-2 text-xs text-gray-500 text-center">
+          <span class="inline-block w-3 h-0.5 align-middle bg-gray-700 mr-1"></span> Observed
+          <span class="inline-block w-3 h-0.5 align-middle border-t border-dashed border-gray-700 ml-4 mr-1"></span> Forecast
+        </div>
+      </section>
+
+      <!-- SYLVANIA, GEORGIA (Antpool + Blockware) -->
+      <section class="rounded-2xl bg-white shadow border border-gray-100">
+        <div class="p-5 border-b border-gray-100">
+          <h2 class="text-xl font-semibold">SYLVANIA, GEORGIA</h2>
+          <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div class="rounded-lg border border-gray-100 p-3">
+              <div class="font-medium">Antpool Hash Rate PH/s</div>
+              <div><span id="syl-antpool-current">—</span></div>
+              <div class="mt-1 text-gray-500">24 HR Antpool Rate PH/s: <span class="font-medium" id="syl-antpool-avg24">—</span></div>
+            </div>
+            <div class="rounded-lg border border-gray-100 p-3">
+              <div class="font-medium">Blockware Hash Rate PH/s</div>
+              <div><span id="syl-blockware-current">—</span></div>
+              <div class="mt-1 text-gray-500">24 HR Blockware Hash Rate: <span class="font-medium" id="syl-blockware-avg24">—</span></div>
+            </div>
+            <div class="rounded-lg border border-gray-100 p-3">
+              <div class="font-medium">Blockware Efficiency</div>
+              <div><span id="syl-blockware-eff">—</span></div>
+            </div>
+            <div class="rounded-lg border border-gray-100 p-3">
+              <div class="font-medium">Total Site Efficiency</div>
+              <div><span id="syl-total-eff">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Location</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Deployed</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Reachable</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Not Hashing</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Hashing</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Efficiency</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 odd:bg-white even:bg-gray-50" id="tbl-syl"></tbody>
+            <tfoot>
+              <tr class="bg-gray-50 font-semibold">
+                <td class="px-4 py-3">Total</td>
+                <td class="px-4 py-3 text-right" id="syl-t-deployed">—</td>
+                <td class="px-4 py-3 text-right" id="syl-t-reachable">—</td>
+                <td class="px-4 py-3 text-right" id="syl-t-nh">—</td>
+                <td class="px-4 py-3 text-right" id="syl-t-h">—</td>
+                <td class="px-4 py-3 text-right" id="syl-t-eff">—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="px-5 pb-4 pt-4 flex justify-end">
+          <button id="btn-bcs-issues"
+                  class="inline-flex items-center gap-2 rounded-lg bg-gray-900 text-white px-3 py-2 text-sm hover:bg-black transition">
+            Download BCS Issues (.txt)
+          </button>
+        </div>
+
+        <div class="p-4 text-xs text-gray-500 border-t border-gray-100">
+          Antpool / Blockware mapping to live data is automatic from pool URLs (antpool, blockwarepool).
+        </div>
+      </section>
+
+      <!-- BITMAIN -->
+      <section class="rounded-2xl bg-white shadow border border-gray-100">
+        <div class="p-5 border-b border-gray-100">
+          <h2 class="text-xl font-semibold">SYLVANIA (BITMAIN), GEORGIA</h2>
+          <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+            <div class="rounded-lg border border-gray-100 p-3">
+              <div class="font-medium">KJDGA</div>
+              <div>Hash Rate: <span class="font-medium" id="bm-kjdga-current">—</span></div>
+              <div class="text-gray-500">24HR Hash Rate: <span class="font-medium" id="bm-kjdga-avg24">—</span></div>
+              <div class="text-gray-500">Hash Rate EFFICIENCY: <span class="font-medium" id="bm-eff">—</span></div>
+            </div>
+            <div class="rounded-lg border border-gray-100 p-3">
+              <div class="font-medium">Totals</div>
+              <div>Hash Rate: <span class="font-medium" id="bitmain-current-dup">—</span></div>
+              <div class="text-gray-500">24HR Hash Rate: <span class="font-medium" id="bitmain-avg24-dup">—</span></div>
+              <div class="text-gray-500">TOTAL SITE EFFICIENCY: <span class="font-medium" id="bm-total-eff">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Location</th>
+                <!-- NEW COLUMN for Bitmain only -->
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Capacity</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Deployed</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Reachable</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Not Hashing</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Hashing</th>
+                <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">Efficiency</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 odd:bg-white even:bg-gray-50" id="tbl-bm"></tbody>
+            <tfoot>
+              <tr class="bg-gray-50 font-semibold">
+                <td class="px-4 py-3">Total</td>
+                <td class="px-4 py-3 text-right">8,840</td>
+                <td class="px-4 py-3 text-right" id="bm-t-deployed">—</td>
+                <td class="px-4 py-3 text-right" id="bm-t-reachable">—</td>
+                <td class="px-4 py-3 text-right" id="bm-t-nh">—</td>
+                <td class="px-4 py-3 text-right" id="bm-t-h">—</td>
+                <td class="px-4 py-3 text-right" id="bm-t-eff">—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="px-5 pb-4 pt-4 flex justify-end">
+          <button id="btn-bm-issues"
+                  class="inline-flex items-center gap-2 rounded-lg bg-gray-900 text-white px-3 py-2 text-sm hover:bg-black transition">
+            Download BM Issues (.txt)
+          </button>
+        </div>
+
+        <div class="p-4 text-xs text-gray-500 border-t border-gray-100">
+          Bitmain / KJDGA mapping uses worker name "kjdga…" and F2Pool via pool URLs.
+        </div>
+      </section>
+
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  <script>
+  // Ensure report pages fetch their own hash-report.json from this folder
+  window.__REPORT_FETCH_BASE__ = location.pathname.replace(/[^/]+$/, '');
+  window.REPORT_TZ = 'America/New_York';
+</script>
+</body>
+</html>

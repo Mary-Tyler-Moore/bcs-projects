@@ -1,0 +1,76 @@
+{
+  "name": "offline-barcode-scanner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline barcode scanner and Foreman API desktop app",
+  "author": "BitCloud Service",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev:web": "next dev --turbopack -p 3000",
+    "dev:app": "cross-env NODE_ENV=development electron ./electron/main.js",
+    "dev": "concurrently -k -r -n NEXT,ELECTRON -c blue,magenta \"npm:dev:web\" \"wait-on http://localhost:3000 && npm run dev:app\"",
+    "build:web": "next build",
+    "postbuild:web": "node -e \"console.log('Next build complete')\"",
+    "build:app": "cross-env NODE_ENV=production electron-builder --win",
+    "build": "npm run build:web && npm run build:app",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@google-cloud/bigquery": "^8.1.1",
+    "idb-keyval": "^6.2.2",
+    "next": "15.5.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/cli": "^4.1.13",
+    "@tailwindcss/postcss": "^4",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.0.0",
+    "electron": "^38.1.2",
+    "electron-builder": "^26.0.12",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.3",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.13",
+    "wait-on": "^9.0.0"
+  },
+  "build": {
+    "appId": "com.bitcloud.barcodeoffline",
+    "productName": "Barcode Offline",
+    "files": [
+      "electron/**",
+      "next.config.mjs",
+      "package.json",
+      "public/**",
+      "package.json"
+    ],
+    "extraResources": [
+      { "from": ".next", "to": "app/.next", "filter": ["**/*"] },
+      { "from": "public", "to": "app/public", "filter": ["**/*"] },
+      { "from": "config", "to": "app/config", "filter": ["**/*"] },
+      { "from": "node_modules/next", "to": "app/node_modules/next", "filter": ["**/*"] },
+      { "from": "node_modules/@next/env", "to": "app/node_modules/@next/env", "filter": ["**/*"] },
+      { "from": "node_modules/styled-jsx", "to": "app/node_modules/styled-jsx", "filter": ["**/*"] },
+      { "from": "node_modules/react", "to": "app/node_modules/react", "filter": ["**/*"] },
+      { "from": "node_modules/react-dom", "to": "app/node_modules/react-dom", "filter": ["**/*"] },
+      { "from": "node_modules/@swc/helpers", "to": "app/node_modules/@swc/helpers", "filter": ["**/*"] },
+      { "from": "node_modules/scheduler", "to": "app/node_modules/scheduler", "filter": ["**/*"] },
+      { "from": "node_modules/client-only", "to": "app/node_modules/client-only", "filter": ["**/*"] },
+      { "from": "node_modules/server-only", "to": "app/node_modules/server-only", "filter": ["**/*"] },
+      { "from": "node_modules/use-sync-external-store", "to": "app/node_modules/use-sync-external-store", "filter": ["**/*"] }
+    ],
+    "directories": { "buildResources": "build" },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    }
+  }
+}
